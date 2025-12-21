@@ -141,6 +141,41 @@ export type Database = {
           },
         ]
       }
+      ingredients: {
+        Row: {
+          brand_id: string | null
+          created_at: string | null
+          id: string
+          image_url: string | null
+          is_available: boolean | null
+          name: string
+        }
+        Insert: {
+          brand_id?: string | null
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          is_available?: boolean | null
+          name: string
+        }
+        Update: {
+          brand_id?: string | null
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          is_available?: boolean | null
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ingredients_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       option_groups: {
         Row: {
           brand_id: string | null
@@ -325,6 +360,36 @@ export type Database = {
             columns: ["store_id"]
             isOneToOne: false
             referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_ingredients: {
+        Row: {
+          ingredient_id: string
+          product_id: string
+        }
+        Insert: {
+          ingredient_id: string
+          product_id: string
+        }
+        Update: {
+          ingredient_id?: string
+          product_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_ingredients_ingredient_id_fkey"
+            columns: ["ingredient_id"]
+            isOneToOne: false
+            referencedRelation: "ingredients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_ingredients_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
             referencedColumns: ["id"]
           },
         ]
