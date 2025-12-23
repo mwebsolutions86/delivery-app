@@ -492,8 +492,11 @@ export type Database = {
           email: string | null
           full_name: string | null
           id: string
+          phone: string | null
           role: string | null
+          status: string | null
           store_id: string | null
+          wallet_balance: number | null
         }
         Insert: {
           avatar_url?: string | null
@@ -502,8 +505,11 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id: string
+          phone?: string | null
           role?: string | null
+          status?: string | null
           store_id?: string | null
+          wallet_balance?: number | null
         }
         Update: {
           avatar_url?: string | null
@@ -512,8 +518,11 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
+          phone?: string | null
           role?: string | null
+          status?: string | null
           store_id?: string | null
+          wallet_balance?: number | null
         }
         Relationships: [
           {
@@ -798,6 +807,17 @@ export type Database = {
       create_order_secure:
         | {
             Args: {
+              p_customer_name: string
+              p_customer_phone: string
+              p_delivery_address: string
+              p_items: Json
+              p_order_type: string
+              p_store_id: string
+            }
+            Returns: Json
+          }
+        | {
+            Args: {
               p_delivery_address: string
               p_items: Json
               p_location?: unknown
@@ -946,6 +966,7 @@ export type Database = {
       }
       geomfromewkt: { Args: { "": string }; Returns: unknown }
       gettransactionid: { Args: never; Returns: unknown }
+      is_admin: { Args: never; Returns: boolean }
       longtransactionsenabled: { Args: never; Returns: boolean }
       populate_geometry_columns:
         | { Args: { tbl_oid: unknown; use_typmod?: boolean }; Returns: number }
