@@ -410,13 +410,18 @@ export type Database = {
       }
       orders: {
         Row: {
+          amount_received: number | null
+          amount_returned: number | null
           brand_id: string | null
+          channel: string | null
           collected_by: string | null
           created_at: string | null
           customer_name: string | null
           customer_phone: string | null
           delivery_address: string | null
           delivery_fee_applied: number | null
+          discount_amount: number | null
+          discount_reason: string | null
           driver_id: string | null
           driver_status: string | null
           id: string
@@ -426,19 +431,25 @@ export type Database = {
           order_type: string | null
           payment_method: string | null
           payment_status: Database["public"]["Enums"]["payment_status"] | null
+          pos_session_id: string | null
           status: Database["public"]["Enums"]["order_status"] | null
           store_id: string
           total_amount: number
           user_id: string | null
         }
         Insert: {
+          amount_received?: number | null
+          amount_returned?: number | null
           brand_id?: string | null
+          channel?: string | null
           collected_by?: string | null
           created_at?: string | null
           customer_name?: string | null
           customer_phone?: string | null
           delivery_address?: string | null
           delivery_fee_applied?: number | null
+          discount_amount?: number | null
+          discount_reason?: string | null
           driver_id?: string | null
           driver_status?: string | null
           id?: string
@@ -448,19 +459,25 @@ export type Database = {
           order_type?: string | null
           payment_method?: string | null
           payment_status?: Database["public"]["Enums"]["payment_status"] | null
+          pos_session_id?: string | null
           status?: Database["public"]["Enums"]["order_status"] | null
           store_id: string
           total_amount: number
           user_id?: string | null
         }
         Update: {
+          amount_received?: number | null
+          amount_returned?: number | null
           brand_id?: string | null
+          channel?: string | null
           collected_by?: string | null
           created_at?: string | null
           customer_name?: string | null
           customer_phone?: string | null
           delivery_address?: string | null
           delivery_fee_applied?: number | null
+          discount_amount?: number | null
+          discount_reason?: string | null
           driver_id?: string | null
           driver_status?: string | null
           id?: string
@@ -470,6 +487,7 @@ export type Database = {
           order_type?: string | null
           payment_method?: string | null
           payment_status?: Database["public"]["Enums"]["payment_status"] | null
+          pos_session_id?: string | null
           status?: Database["public"]["Enums"]["order_status"] | null
           store_id?: string
           total_amount?: number
@@ -477,7 +495,61 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "orders_pos_session_id_fkey"
+            columns: ["pos_session_id"]
+            isOneToOne: false
+            referencedRelation: "pos_sessions"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "orders_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pos_sessions: {
+        Row: {
+          actual_closing_balance: number | null
+          closed_at: string | null
+          expected_closing_balance: number | null
+          id: string
+          notes: string | null
+          opened_at: string
+          opened_by: string
+          opening_balance: number
+          status: string
+          store_id: string
+        }
+        Insert: {
+          actual_closing_balance?: number | null
+          closed_at?: string | null
+          expected_closing_balance?: number | null
+          id?: string
+          notes?: string | null
+          opened_at?: string
+          opened_by: string
+          opening_balance?: number
+          status?: string
+          store_id: string
+        }
+        Update: {
+          actual_closing_balance?: number | null
+          closed_at?: string | null
+          expected_closing_balance?: number | null
+          id?: string
+          notes?: string | null
+          opened_at?: string
+          opened_by?: string
+          opening_balance?: number
+          status?: string
+          store_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pos_sessions_store_id_fkey"
             columns: ["store_id"]
             isOneToOne: false
             referencedRelation: "stores"
@@ -1804,8 +1876,8 @@ export type Database = {
         | "out_for_delivery"
         | "delivered"
         | "cancelled"
-      payment_status: "pending" | "collected" | "remitted"
-      product_type: "simple" | "variable" | "combo"
+      payment_status: "pending" | "collected" | "remitted" | "partially_paid"
+      product_type: "simple" | "variable" | "combo" | "pos_only"
     }
     CompositeTypes: {
       geometry_dump: {
@@ -1950,8 +2022,8 @@ export const Constants = {
         "delivered",
         "cancelled",
       ],
-      payment_status: ["pending", "collected", "remitted"],
-      product_type: ["simple", "variable", "combo"],
+      payment_status: ["pending", "collected", "remitted", "partially_paid"],
+      product_type: ["simple", "variable", "combo", "pos_only"],
     },
   },
 } as const
