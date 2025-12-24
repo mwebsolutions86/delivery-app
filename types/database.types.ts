@@ -76,6 +76,86 @@ export type Database = {
           },
         ]
       }
+      combo_step_items: {
+        Row: {
+          created_at: string | null
+          extra_price: number | null
+          id: string
+          is_default: boolean | null
+          product_id: string | null
+          step_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          extra_price?: number | null
+          id?: string
+          is_default?: boolean | null
+          product_id?: string | null
+          step_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          extra_price?: number | null
+          id?: string
+          is_default?: boolean | null
+          product_id?: string | null
+          step_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "combo_step_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "combo_step_items_step_id_fkey"
+            columns: ["step_id"]
+            isOneToOne: false
+            referencedRelation: "combo_steps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      combo_steps: {
+        Row: {
+          created_at: string | null
+          id: string
+          max_selection: number | null
+          min_selection: number | null
+          name: string
+          product_id: string | null
+          sort_order: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          max_selection?: number | null
+          min_selection?: number | null
+          name: string
+          product_id?: string | null
+          sort_order?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          max_selection?: number | null
+          min_selection?: number | null
+          name?: string
+          product_id?: string | null
+          sort_order?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "combo_steps_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cust_profiles: {
         Row: {
           address: string | null
@@ -176,6 +256,41 @@ export type Database = {
           },
         ]
       }
+      kitchen_stations: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          printer_ip: string | null
+          store_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          printer_ip?: string | null
+          store_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          printer_ip?: string | null
+          store_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kitchen_stations_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       option_groups: {
         Row: {
           brand_id: string | null
@@ -258,6 +373,8 @@ export type Database = {
           product_id: string | null
           product_name: string
           quantity: number
+          total_price: number | null
+          unit_price: number | null
         }
         Insert: {
           id?: string
@@ -267,6 +384,8 @@ export type Database = {
           product_id?: string | null
           product_name: string
           quantity: number
+          total_price?: number | null
+          unit_price?: number | null
         }
         Update: {
           id?: string
@@ -276,6 +395,8 @@ export type Database = {
           product_id?: string | null
           product_name?: string
           quantity?: number
+          total_price?: number | null
+          unit_price?: number | null
         }
         Relationships: [
           {
@@ -427,6 +548,47 @@ export type Database = {
           },
         ]
       }
+      product_variations: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_available: boolean | null
+          name: string
+          price: number
+          product_id: string | null
+          sku: string | null
+          sort_order: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_available?: boolean | null
+          name: string
+          price: number
+          product_id?: string | null
+          sku?: string | null
+          sort_order?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_available?: boolean | null
+          name?: string
+          price?: number
+          product_id?: string | null
+          sku?: string | null
+          sort_order?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_variations_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           brand_id: string | null
@@ -437,9 +599,17 @@ export type Database = {
           image_url: string | null
           ingredients: string[] | null
           is_available: boolean | null
+          kitchen_station_id: string | null
           name: string
           options_config: Json | null
+          plu_code: string | null
+          preparation_time: number | null
           price: number
+          price_delivery: number | null
+          price_dine_in: number | null
+          price_takeaway: number | null
+          tax_rate: number | null
+          type: Database["public"]["Enums"]["product_type"] | null
         }
         Insert: {
           brand_id?: string | null
@@ -450,9 +620,17 @@ export type Database = {
           image_url?: string | null
           ingredients?: string[] | null
           is_available?: boolean | null
+          kitchen_station_id?: string | null
           name: string
           options_config?: Json | null
+          plu_code?: string | null
+          preparation_time?: number | null
           price: number
+          price_delivery?: number | null
+          price_dine_in?: number | null
+          price_takeaway?: number | null
+          tax_rate?: number | null
+          type?: Database["public"]["Enums"]["product_type"] | null
         }
         Update: {
           brand_id?: string | null
@@ -463,9 +641,17 @@ export type Database = {
           image_url?: string | null
           ingredients?: string[] | null
           is_available?: boolean | null
+          kitchen_station_id?: string | null
           name?: string
           options_config?: Json | null
+          plu_code?: string | null
+          preparation_time?: number | null
           price?: number
+          price_delivery?: number | null
+          price_dine_in?: number | null
+          price_takeaway?: number | null
+          tax_rate?: number | null
+          type?: Database["public"]["Enums"]["product_type"] | null
         }
         Relationships: [
           {
@@ -480,6 +666,13 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_kitchen_station_id_fkey"
+            columns: ["kitchen_station_id"]
+            isOneToOne: false
+            referencedRelation: "kitchen_stations"
             referencedColumns: ["id"]
           },
         ]
@@ -811,6 +1004,7 @@ export type Database = {
               p_customer_phone: string
               p_delivery_address: string
               p_items: Json
+              p_notes?: string
               p_order_type: string
               p_store_id: string
             }
@@ -1611,6 +1805,7 @@ export type Database = {
         | "delivered"
         | "cancelled"
       payment_status: "pending" | "collected" | "remitted"
+      product_type: "simple" | "variable" | "combo"
     }
     CompositeTypes: {
       geometry_dump: {
@@ -1756,6 +1951,7 @@ export const Constants = {
         "cancelled",
       ],
       payment_status: ["pending", "collected", "remitted"],
+      product_type: ["simple", "variable", "combo"],
     },
   },
 } as const
