@@ -758,6 +758,7 @@ export type Database = {
           full_name: string | null
           id: string
           phone: string | null
+          pos_pin: string | null
           role: string | null
           status: string | null
           store_id: string | null
@@ -771,6 +772,7 @@ export type Database = {
           full_name?: string | null
           id: string
           phone?: string | null
+          pos_pin?: string | null
           role?: string | null
           status?: string | null
           store_id?: string | null
@@ -784,6 +786,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           phone?: string | null
+          pos_pin?: string | null
           role?: string | null
           status?: string | null
           store_id?: string | null
