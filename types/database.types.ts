@@ -663,7 +663,7 @@ export type Database = {
       }
       products: {
         Row: {
-          brand_id: string | null
+          brand_id: string
           category_id: string | null
           created_at: string | null
           description: string | null
@@ -684,7 +684,7 @@ export type Database = {
           type: Database["public"]["Enums"]["product_type"] | null
         }
         Insert: {
-          brand_id?: string | null
+          brand_id: string
           category_id?: string | null
           created_at?: string | null
           description?: string | null
@@ -705,7 +705,7 @@ export type Database = {
           type?: Database["public"]["Enums"]["product_type"] | null
         }
         Update: {
-          brand_id?: string | null
+          brand_id?: string
           category_id?: string | null
           created_at?: string | null
           description?: string | null
@@ -1234,6 +1234,41 @@ export type Database = {
         Returns: boolean
       }
       geomfromewkt: { Args: { "": string }; Returns: unknown }
+      get_pos_live_orders: { Args: { p_store_id: string }; Returns: Json }
+      get_pos_menu_sync: { Args: { p_brand_id: string }; Returns: Json }
+      get_pos_staff_sync: {
+        Args: { p_store_id: string }
+        Returns: {
+          avatar_url: string | null
+          brand_id: string | null
+          created_at: string | null
+          email: string | null
+          full_name: string | null
+          id: string
+          phone: string | null
+          pos_pin: string | null
+          role: string | null
+          status: string | null
+          store_id: string | null
+          wallet_balance: number | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      get_pos_store_config: {
+        Args: { p_store_id: string }
+        Returns: {
+          address: string
+          brand_id: string
+          currency: string
+          id: string
+          name: string
+        }[]
+      }
       gettransactionid: { Args: never; Returns: unknown }
       is_admin: { Args: never; Returns: boolean }
       longtransactionsenabled: { Args: never; Returns: boolean }
@@ -1859,6 +1894,10 @@ export type Database = {
         Returns: unknown
       }
       unlockrows: { Args: { "": string }; Returns: number }
+      update_order_status_pos: {
+        Args: { new_status: string; target_order_id: string }
+        Returns: Json
+      }
       updategeometrysrid: {
         Args: {
           catalogn_name: string
