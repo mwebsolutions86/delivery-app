@@ -3,16 +3,15 @@ import { StyleSheet, View, Text, FlatList, TouchableOpacity, Alert, RefreshContr
 import { supabase } from '@/lib/supabase';
 import { Ionicons } from '@expo/vector-icons'; // Icônes natives Expo
 
-const CURRENT_DRIVER_ID = 1; // Karim (ID fixe pour le MVP)
-
 // Types stricts
 type Order = {
-  id: number;
+  id: string;
   status: string;
   total_amount: number;
-  delivery_address: string;
-  delivery_fee: number;
-  guest_info: { name: string; phone: string };
+  delivery_address: string | null;
+  delivery_fee?: number;
+  customer_name: string | null;
+  customer_phone: string | null;
   store: { name: string; address: string }; // Via jointure
 };
 
@@ -21,8 +20,22 @@ export default function DriverDashboard() {
   const [myOrder, setMyOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(false);
   const [tab, setTab] = useState<'available' | 'active'>('available');
+  const [driverId, setDriverId] = useState<string | null>(null);
 
   useEffect(() => {
+    // Récupérer l'ID du driver connecté
+    const getDriverId = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setDriverId(user.id);
+      }
+    };
+    getDriverId();
+  }, []);
+
+  useEffect(() => {
+    if (!driverId) return;
+    
     fetchData();
     
     // Abonnement Temps Réel (Simple)
@@ -33,18 +46,20 @@ export default function DriverDashboard() {
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, []);
+  }, [driverId]);
 
   const fetchData = async () => {
+    if (!driverId) return;
+    
     setLoading(true);
     try {
       // 1. Chercher si j'ai une course en cours
       const { data: activeData } = await supabase
         .from('orders')
         .select('*, store:stores(name, address)')
-        .eq('driver_id', CURRENT_DRIVER_ID)
-        .in('status', ['ASSIGNED', 'PICKED_UP'])
-        .single();
+        .eq('driver_id', driverId)
+        .in('status', ['out_for_delivery'])
+        .maybeSingle();
 
       if (activeData) {
         setMyOrder(activeData);
@@ -57,7 +72,8 @@ export default function DriverDashboard() {
       const { data: pendingData } = await supabase
         .from('orders')
         .select('*, store:stores(name, address)')
-        .eq('status', 'READY_FOR_PICKUP')
+        .eq('status', 'ready')
+        .eq('order_type', 'delivery')
         .is('driver_id', null);
 
       if (pendingData) setAvailableOrders(pendingData);
@@ -71,12 +87,14 @@ export default function DriverDashboard() {
 
   // --- ACTIONS LOGISTIQUES ---
 
-  const acceptOrder = async (orderId: number) => {
+  const acceptOrder = async (orderId: string) => {
+    if (!driverId) return;
+    
     const { error } = await supabase
       .from('orders')
       .update({ 
-        status: 'ASSIGNED', 
-        driver_id: CURRENT_DRIVER_ID 
+        status: 'out_for_delivery', 
+        driver_id: driverId 
       })
       .eq('id', orderId);
 
@@ -86,7 +104,7 @@ export default function DriverDashboard() {
 
   const confirmPickup = async () => {
     if (!myOrder) return;
-    await supabase.from('orders').update({ status: 'PICKED_UP' }).eq('id', myOrder.id);
+    await supabase.from('orders').update({ status: 'out_for_delivery' }).eq('id', myOrder.id);
     fetchData();
   };
 
@@ -96,13 +114,12 @@ export default function DriverDashboard() {
     await supabase
       .from('orders')
       .update({ 
-        status: 'DELIVERED',
-        payment_status: 'PAID', // On suppose qu'il a encaissé le Cash
-        delivered_at: new Date().toISOString()
+        status: 'delivered',
+        payment_status: 'collected' // Statut conforme à l'enum DB
       })
       .eq('id', myOrder.id);
     
-    Alert.alert("Bravo Karim ! 💰", "Livraison terminée et encaissée.");
+    Alert.alert("Livraison terminée 💰", "Commande livrée et encaissée.");
     fetchData();
     setTab('available');
   };
@@ -128,7 +145,7 @@ export default function DriverDashboard() {
 
       <View style={styles.row}>
         <Ionicons name="person" size={16} color="#666" />
-        <Text style={styles.infoText}>{item.guest_info?.name}</Text>
+        <Text style={styles.infoText}>{item.customer_name || 'Client'}</Text>
       </View>
 
       <TouchableOpacity style={styles.acceptButton} onPress={() => acceptOrder(item.id)}>
@@ -147,13 +164,13 @@ export default function DriverDashboard() {
         </View>
     );
 
-    const isPickedUp = myOrder.status === 'PICKED_UP';
+    const isOutForDelivery = myOrder.status === 'out_for_delivery';
 
     return (
       <View style={styles.activeContainer}>
         <View style={styles.bigCard}>
             <Text style={styles.statusBadge}>
-                {isPickedUp ? 'EN ROUTE VERS CLIENT 🛵' : 'EN ROUTE VERS RESTO 🍳'}
+                {isOutForDelivery ? 'EN ROUTE VERS CLIENT 🛵' : 'EN ROUTE VERS RESTO 🍳'}
             </Text>
             
             <Text style={styles.bigPrice}>{myOrder.total_amount} DH</Text>
@@ -162,15 +179,15 @@ export default function DriverDashboard() {
             <View style={styles.divider} />
 
             <Text style={styles.label}>DESTINATION :</Text>
-            <Text style={styles.bigAddress}>{myOrder.delivery_address}</Text>
+            <Text style={styles.bigAddress}>{myOrder.delivery_address || 'Adresse non disponible'}</Text>
             
             <Text style={styles.label}>CLIENT :</Text>
-            <Text style={styles.clientName}>{myOrder.guest_info?.name}</Text>
-            <Text style={styles.phone}>{myOrder.guest_info?.phone}</Text>
+            <Text style={styles.clientName}>{myOrder.customer_name || 'Client'}</Text>
+            <Text style={styles.phone}>{myOrder.customer_phone || ''}</Text>
 
             <View style={{flex: 1}} />
 
-            {!isPickedUp ? (
+            {!isOutForDelivery ? (
                 <TouchableOpacity style={[styles.actionButton, {backgroundColor: '#f97316'}]} onPress={confirmPickup}>
                     <Text style={styles.actionText}>J'AI RÉCUPÉRÉ LA COMMANDE</Text>
                 </TouchableOpacity>
