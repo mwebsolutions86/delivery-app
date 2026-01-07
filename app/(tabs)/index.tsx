@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Text, FlatList, TouchableOpacity, Alert, RefreshControl, SafeAreaView } from 'react-native';
+import { StyleSheet, View, Text, FlatList, TouchableOpacity, Alert, RefreshControl, SafeAreaView, Platform } from 'react-native';
 import { supabase } from '@/lib/supabase';
 import { Ionicons } from '@expo/vector-icons'; // Icônes natives Expo
 
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
   activeTabText: { color: 'black' },
   list: { padding: 15 },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center', marginTop: 50 },
-  card: { backgroundColor: 'white', padding: 15, borderRadius: 12, marginBottom: 15, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 5, elevation: 2 },
+  card: { backgroundColor: 'white', padding: 15, borderRadius: 12, marginBottom: 15, ...(Platform.OS !== 'web' ? { shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 5, elevation: 2 } : {}), boxShadow: Platform.OS === 'web' ? '0 6px 14px rgba(0,0,0,0.06)' : undefined },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 },
   orderId: { fontWeight: 'bold', fontSize: 16 },
   price: { fontWeight: 'bold', fontSize: 18, color: '#16a34a' },
@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
   
   // Styles Active Screen
   activeContainer: { flex: 1, padding: 20 },
-  bigCard: { flex: 1, backgroundColor: 'white', borderRadius: 20, padding: 20, alignItems: 'center', shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 10, elevation: 5 },
+  bigCard: { flex: 1, backgroundColor: 'white', borderRadius: 20, padding: 20, alignItems: 'center', ...(Platform.OS !== 'web' ? { shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 10, elevation: 5 } : {}), boxShadow: Platform.OS === 'web' ? '0 10px 30px rgba(0,0,0,0.06)' : undefined },
   statusBadge: { backgroundColor: '#e0f2fe', color: '#0284c7', paddingHorizontal: 15, paddingVertical: 5, borderRadius: 20, fontWeight: 'bold', marginBottom: 20, overflow: 'hidden' },
   bigPrice: { fontSize: 40, fontWeight: '900', color: '#111' },
   paymentMethod: { color: '#666', marginBottom: 20 },
